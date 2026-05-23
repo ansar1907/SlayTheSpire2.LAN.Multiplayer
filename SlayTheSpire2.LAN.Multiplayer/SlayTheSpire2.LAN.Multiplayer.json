@@ -1,0 +1,12 @@
+{
+  "id": "SlayTheSpire2.LAN.Multiplayer",
+  "name": "LAN Multiplayer",
+  "author": "kmyuhkyuk",
+  "description": "LAN Multiplayer for Slay the Spire 2",
+  "version": "1.6.4",
+  "has_pck": true,
+  "has_dll": true,
+  "min_game_version": "0.105.0",
+  "dependencies": [],
+  "affects_gameplay": true
+}
