@@ -22,7 +22,11 @@ namespace SlayTheSpire2.LAN.Multiplayer.Patchs.Screens
         {
             var buttonContainerNode = __instance.GetNode("ButtonContainer");
 
-            var lanHostButton = (NSubmenuButton)buttonContainerNode.GetNode("HostButton").Duplicate();
+            var hostButton = buttonContainerNode.GetNode<NSubmenuButton>("HostButton");
+            var loadButton = buttonContainerNode.GetNode<NSubmenuButton>("LoadButton");
+            var abandonButton = buttonContainerNode.GetNode<NSubmenuButton>("AbandonButton");
+
+            var lanHostButton = (NSubmenuButton)hostButton.Duplicate();
 
             NSubmenuButtonDuplicateMaterial(lanHostButton);
 
@@ -57,7 +61,7 @@ namespace SlayTheSpire2.LAN.Multiplayer.Patchs.Screens
 
             LanMultiplayerSubmenuButtonService.Instance.LanHostButton = lanHostButton;
 
-            var lanLoadButton = (NSubmenuButton)buttonContainerNode.GetNode("LoadButton").Duplicate();
+            var lanLoadButton = (NSubmenuButton)loadButton.Duplicate();
 
             NSubmenuButtonDuplicateMaterial(lanLoadButton);
 
@@ -83,7 +87,7 @@ namespace SlayTheSpire2.LAN.Multiplayer.Patchs.Screens
 
             LanMultiplayerSubmenuButtonService.Instance.LanLoadButton = lanLoadButton;
 
-            var lanAbandonButton = (NSubmenuButton)buttonContainerNode.GetNode("AbandonButton").Duplicate();
+            var lanAbandonButton = (NSubmenuButton)abandonButton.Duplicate();
 
             NSubmenuButtonDuplicateMaterial(lanAbandonButton);
 
@@ -102,6 +106,8 @@ namespace SlayTheSpire2.LAN.Multiplayer.Patchs.Screens
                 }));
 
             LanMultiplayerSubmenuButtonService.Instance.LanAbandonButton = lanAbandonButton;
+
+            HideBaseMultiplayerRunButtons(__instance);
         }
 
         private static void NSubmenuButtonDuplicateMaterial(NSubmenuButton nSubmenuButton)
@@ -109,28 +115,38 @@ namespace SlayTheSpire2.LAN.Multiplayer.Patchs.Screens
             var bgPanel = nSubmenuButton.GetNode<Control>("BgPanel");
             bgPanel.Material = (Material)bgPanel.Material.Duplicate();
         }
+
+        internal static void HideBaseMultiplayerRunButtons(NMultiplayerSubmenu instance)
+        {
+            var buttonContainerNode = instance.GetNode("ButtonContainer");
+            buttonContainerNode.GetNode<NSubmenuButton>("HostButton").Visible = false;
+            buttonContainerNode.GetNode<NSubmenuButton>("LoadButton").Visible = false;
+            buttonContainerNode.GetNode<NSubmenuButton>("AbandonButton").Visible = false;
+        }
     }
 
     [HarmonyPatch(typeof(NMultiplayerSubmenu), "UpdateButtons")]
     internal class NMultiplayerSubmenuUpdateButtonsPatch
     {
-        private static void Postfix()
+        private static void Postfix(NMultiplayerSubmenu __instance)
         {
+            NMultiplayerSubmenuReadyPatch.HideBaseMultiplayerRunButtons(__instance);
+
             var lanMultiplayerSubmenuButtonService = LanMultiplayerSubmenuButtonService.Instance;
 
-            if (lanMultiplayerSubmenuButtonService.LanHostButton != null)
+            if (GodotObject.IsInstanceValid(lanMultiplayerSubmenuButtonService.LanHostButton))
             {
                 lanMultiplayerSubmenuButtonService.LanHostButton.Visible =
                     !LanRunSaveManagerService.Instance.HasMultiplayerRunSave;
             }
 
-            if (lanMultiplayerSubmenuButtonService.LanLoadButton != null)
+            if (GodotObject.IsInstanceValid(lanMultiplayerSubmenuButtonService.LanLoadButton))
             {
                 lanMultiplayerSubmenuButtonService.LanLoadButton.Visible =
                     LanRunSaveManagerService.Instance.HasMultiplayerRunSave;
             }
 
-            if (lanMultiplayerSubmenuButtonService.LanAbandonButton != null)
+            if (GodotObject.IsInstanceValid(lanMultiplayerSubmenuButtonService.LanAbandonButton))
             {
                 lanMultiplayerSubmenuButtonService.LanAbandonButton.Visible =
                     LanRunSaveManagerService.Instance.HasMultiplayerRunSave;
